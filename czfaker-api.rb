@@ -96,4 +96,10 @@ class CzFakerAPI < Sinatra::Base
     end
 
   end
+
+  get '/healtz' do
+    status 200
+    {status: "OK", message: "I'm alive"}.to_json
+  end
+
 end
