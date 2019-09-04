@@ -2,81 +2,98 @@ require 'sinatra'
 require 'json'
 require 'cz_faker'
 
-
-allowed_klasses = CzFaker.constants.select {|c| CzFaker.const_get(c).is_a? Class}
-
-set :json_encoder, :to_json
-
 class CzFakerAPI < Sinatra::Base
 
-def par_from_params(param)
-  if param == nil 
-    "nil"
-  elsif ["true", "false"].include?(param)
-    param
-  else
-    ":#{param}"
-  end
-end
+  set :json_encoder, :to_json
 
-get '/:klass/:method' do
-  keys = %i[ klass ]
-
-  method = params[:method]
-
-  klasses = [ 'CzFaker' ]
-  
-  keys.each do |k|
-    klass = params[k].split("_").map(&:capitalize).join
-    klasses << klass if allowed_klasses.include?(klass.to_sym)
+  def param_from_params(param)
+    if param == nil 
+      "nil"
+    elsif ["true", "false"].include?(param)
+      param
+#    elsif ( Integer(param) rescue false )
+#      Integer(param)
+#    elsif ( Float(param) rescue false )
+#      Float(param)      
+    else
+      "\"#{param}\""
+    end
   end
 
-  klass = klasses.join("::")
+  def params_to_klass(klasses ,params)
+    keys = %i[ klass ]
 
-  allowed_methods = ( Object.const_get(klass).methods - Object.methods )
+    allowed_klasses = CzFaker.constants.select {|c| CzFaker.const_get(c).is_a? Class}
 
-  faker_call = [ klass, params[:method] ].join "." if allowed_methods.include?(params[:method].to_sym)
+    klasses
 
-  eval faker_call
+    keys.each do |k|
+      klass = params[k].split("_").map(&:capitalize).join
+      klasses << klass if allowed_klasses.include?(klass.to_sym)
+    end
 
-  parameters = Object.const_get(klass).method(method.to_sym).parameters
-  
-  call_params = []
-
-  parameters.each do |par|
-    call_params << par_from_params(params[par[1]])
+    klasses.join("::")
   end
 
-  faker_call = faker_call + "(" + call_params.join(',')  + ")"
+  def params_to_method_params(klass, method)
+    parameters = Object.const_get(klass).method(method.to_sym).parameters
+    
+    call_params = []
 
-  puts faker_call
-  begin
-    result = eval(faker_call)
-    {call: faker_call, result: result}.to_json
-  rescue SyntaxError => se
-    status 400
-    {call: faker_call, message: 'Server problem or wrong call'}.to_json
-  rescue
-    status 500
-    {call: faker_call, message: 'Server problem or wrong call'}.to_json
+    parameters.each do |par|
+      call_params << param_from_params(params[par[1]])
+    end
+
+    call_params.join(',')
   end
 
-end
-
-get '/validator/:method' do
-  keys = %i[ klass ]
-
-  klasses = [ 'CzFaker::Validator' ]
-
-  keys.each do |k|
-    klass = params[k].split("_").map(&:capitalize).join
-    klasses << klass if allowed_klasses.include?(klass.to_sym)
+  def klass_and_method_to_call(klass, method)
+    allowed_methods = ( Object.const_get(klass).methods - Object.methods )
+    [ klass, method ].join "." if allowed_methods.include?(method.to_sym)
   end
 
-  klass = klasses.join("::")
+  get '/:klass/:method' do
+    klasses = [ 'CzFaker' ]
 
-  faker_call = [ klass, params[:method] ].join "."
+    method = params[:method]
+    klass = params_to_klass(klasses, params)
+    faker_call = klass_and_method_to_call(klass, method)
+    faker_call_params = params_to_method_params(klass, method)
+    faker_call = faker_call + "(" + faker_call_params  + ")"
 
-  eval faker_call
-end
+    begin
+      result = eval(faker_call)
+      {call: faker_call, result: result}.to_json
+    rescue SyntaxError => se
+      status 400
+      {call: faker_call, message: 'Server problem or wrong call'}.to_json
+    rescue
+      status 500
+      {call: faker_call, message: 'Server problem or wrong call'}.to_json
+    end
+
+  end
+
+  get '/validator/:klass/:method' do
+    klasses = [ 'CzFaker::Validator' ]
+
+    method = params[:method] + "?"
+    
+    klass = params_to_klass(klasses, params)
+    faker_call = klass_and_method_to_call(klass, method)
+    faker_call_params = params_to_method_params(klass, method)
+    faker_call = faker_call + "(" + faker_call_params  + ")"
+
+    begin
+      result = eval(faker_call)
+      {call: faker_call, result: result}.to_json
+    rescue SyntaxError => se
+      status 400
+      {call: faker_call, message: 'Server problem or wrong call'}.to_json
+    rescue
+      status 500
+      {call: faker_call, message: 'Server problem or wrong call'}.to_json
+    end
+
+  end
 end

@@ -3,7 +3,7 @@ environment 'production'
 
 daemonize false
 
-bind 'tcp://0.0.0.0:8888'
+bind 'tcp://0.0.0.0:4567'
 bind "unix://#{root}/tmp/puma/socket"
 pidfile "#{root}/tmp/puma/pid"
 state_path "#{root}/tmp/puma/state"
