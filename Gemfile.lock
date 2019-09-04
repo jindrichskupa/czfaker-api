@@ -1,19 +1,17 @@
 GEM
   specs:
-    cz_faker (0.0.5)
+    cz_faker (0.0.6)
     mustermann (1.0.3)
-    nio4r (2.5.1)
-    puma (4.1.0)
-      nio4r (~> 2.0)
-    rack (2.0.7)
-    rack-protection (2.0.7)
+    puma (3.11.3)
+    rack (2.0.4)
+    rack-protection (2.0.5)
       rack
-    sinatra (2.0.7)
+    sinatra (2.0.5)
       mustermann (~> 1.0)
       rack (~> 2.0)
-      rack-protection (= 2.0.7)
+      rack-protection (= 2.0.5)
       tilt (~> 2.0)
-    tilt (2.0.9)
+    tilt (2.0.8)
 
 PLATFORMS
   ruby

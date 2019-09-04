@@ -7,6 +7,8 @@ allowed_klasses = CzFaker.constants.select {|c| CzFaker.const_get(c).is_a? Class
 
 set :json_encoder, :to_json
 
+class CzFakerAPI < Sinatra::Base
+
 def par_from_params(param)
   if param == nil 
     "nil"
@@ -76,4 +78,5 @@ get '/validator/:method' do
   faker_call = [ klass, params[:method] ].join "."
 
   eval faker_call
+end
 end

@@ -13,7 +13,7 @@ Start puma server on server and call via HTTP, method is allways GET:
 
 ``` bash
 bundle install
-bundle exec ruby cz_faker.rb -s puma
+bundle exec puma -C puma.rb
 ```
 
 ### Call
