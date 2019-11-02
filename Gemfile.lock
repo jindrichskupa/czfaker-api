@@ -4,7 +4,7 @@ GEM
     cz_faker (0.0.6)
     mustermann (1.0.3)
     puma (3.11.3)
-    rack (2.0.4)
+    rack (2.0.7)
     rack-protection (2.0.5)
       rack
     sinatra (2.0.5)
