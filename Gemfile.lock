@@ -4,7 +4,9 @@ GEM
     cz_faker (0.0.6)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
-    puma (3.11.3)
+    nio4r (2.5.8)
+    puma (4.3.12)
+      nio4r (~> 2.0)
     rack (2.2.4)
     rack-protection (2.2.0)
       rack
